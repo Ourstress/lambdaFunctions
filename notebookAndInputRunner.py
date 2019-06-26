@@ -61,7 +61,20 @@ def lambda_handler(event, context):
                      </md-field>
                 </md-card-content>
             </md-card>
-                    <button v-on:click="staygo">Submit</button>
+            <md-card>
+                <md-card-header>
+                    <md-card-header-text>
+                        <div class="md-title">Enter Hidden input</div>
+                        <div class="md-subhead">Hidden input for custom activity creators</div>
+                    </md-card-header-text>
+                </md-card-header>
+                <md-card-content>
+                    <md-field>
+                        <md-textarea v-model="hidden"></md-textarea>
+                     </md-field>
+                </md-card-content>
+            </md-card>
+                    <button v-on:click="postToLambdaFunction">Submit</button>
             </div>
             <div id="cardGroupPreview" class="md-layout-item md-size-50">
                 <md-card>
@@ -103,7 +116,8 @@ def lambda_handler(event, context):
             input:"",
             answer:"",
             notebook:"",
-            uploadedNotebookData: ""
+            uploadedNotebookData: "",
+            hidden:""
             }
         },
         methods: {
@@ -116,7 +130,7 @@ def lambda_handler(event, context):
                 const file = this.notebook[0]
                 reader.readAsText(file)
             },
-            staygo: function () {
+            postToLambdaFunction: function () {
             // comment: leaving the gatewayUrl empty - API will post back to itself
                 const gatewayUrl = '';
                 fetch(gatewayUrl, {
@@ -125,7 +139,7 @@ def lambda_handler(event, context):
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({uploadedNotebookData:this.uploadedNotebookData,notebookUrl:this.notebookSource,input:this.input})
+                body: JSON.stringify({uploadedNotebookData:this.uploadedNotebookData,notebookUrl:this.notebookSource,input:this.input,hidden:this.hidden})
                 }).then(response => {
                 return response.json()
                  }).then(data => {
@@ -195,41 +209,41 @@ def lambda_handler(event, context):
         response = ""
         bodyContent = event.get('body',{}) 
         parsedBodyContent = json.loads(bodyContent)
-        try:
-            notebookContents = parsedBodyContent["uploadedNotebookData"] or get_notebook_from_colab_url(parsedBodyContent['notebookUrl'])
-            payload = json.loads(json.dumps({
-                "notebook": notebookContents,
-                "files": {"hello.txt":str(base64.b64encode(bytes(json.dumps(parsedBodyContent['input']), "utf-8")))[2: -1]}
-            }))
-            # post to jupyternotebook lambda function
-            jupyterNbExecuter = os.environ['jupyterNbExecuter']
-            modelResponse = requests.post(jupyterNbExecuter, json=payload)
-            if(modelResponse.status_code == 200):
-                if(modelResponse.json()["result"]):
-                    results = modelResponse.json()["result"]
-                    response = {
-                        "statusCode": 200,
+        def response(statusCode, result):
+            return {
+                        "statusCode": statusCode,
                         "headers": {
                             "Content-Type": "application/json",
                         },
                         "body":  json.dumps({
                             "isComplete":True,
-                            "jsonFeedback": results,
-                            "htmlFeedback": results,
-                            "textFeedback": results                        
+                            "jsonFeedback": result,
+                            "htmlFeedback": result,
+                            "textFeedback": result                        
                         })
                     }
-                    return response
+        try:
+            if parsedBodyContent["uploadedNotebookData"] or parsedBodyContent["notebookUrl"]:
+                notebookContents = parsedBodyContent["uploadedNotebookData"] or get_notebook_from_colab_url(parsedBodyContent['notebookUrl'])
+                payload = json.loads(json.dumps({
+                "notebook": notebookContents,
+                "files": {"hello.txt":str(base64.b64encode(bytes(json.dumps(parsedBodyContent['input']), "utf-8")))[2: -1]}
+                }))
+                # post to jupyternotebook lambda function
+                jupyterNbExecuter = os.environ['jupyterNbExecuter']
+                modelResponse = requests.post(jupyterNbExecuter, json=payload)
+                if(modelResponse.status_code == 200):
+                    if(modelResponse.json()["result"]):
+                        results = modelResponse.json()["result"]
+                        return response(200, results)
+                elif(modelResponse.status_code == 504):
+                    results = "Lambda function timeout - exceed 30s time limit - consider reducing resources consumed, eg number of epochs"
+                    return response(504, results)
+                else:
+                    results = "No response returned from notebook"
+                    return response(500, results)
             else:
-                response = {
-                    "statusCode": 500,
-                    "headers": {
-                        "Content-Type": "application/json",
-                    },
-                    "body":  json.dumps({
-                        "results": "no results returned from notebook"
-                    })
-                }
-                return response
+                results = "No notebook supplied"
+                return response(406, results)
         except Exception as ex:
            print(ex)
