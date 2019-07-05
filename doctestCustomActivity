@@ -432,7 +432,7 @@ def lambda_handler(event, context):
             "Content-Type": "application/json",
                 },
             "body":  json.dumps({
-                "isComplete":True,
+                "isComplete":jsonResponseData.get("solved"),
                 "jsonFeedback": jsonResponse,
                 "htmlFeedback": htmlResults,
                 "textFeedback": textResults
