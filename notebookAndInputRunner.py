@@ -227,11 +227,12 @@ def lambda_handler(event, context):
                 notebookContents = parsedBodyContent["uploadedNotebookData"] or get_notebook_from_colab_url(parsedBodyContent['notebookUrl'])
                 payload = json.loads(json.dumps({
                 "notebook": notebookContents,
-                "files": {"hello.txt":str(base64.b64encode(bytes(json.dumps(parsedBodyContent['input']), "utf-8")))[2: -1]}
+                "files": {"data.json":str(base64.b64encode(bytes(json.dumps(parsedBodyContent['input']), "utf-8")))[2: -1]}
                 }))
                 # post to jupyternotebook lambda function
                 jupyterNbExecuter = os.environ['jupyterNbExecuter']
                 modelResponse = requests.post(jupyterNbExecuter, json=payload)
+                print(modelResponse)
                 if(modelResponse.status_code == 200):
                     if(modelResponse.json()["result"]):
                         results = modelResponse.json()["result"]
