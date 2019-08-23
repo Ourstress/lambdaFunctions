@@ -146,7 +146,7 @@ exports.handler = async (event) => {
                 const {data, questionName} = response
                 if (data.htmlFeedback) {
                     const searchText = data.htmlFeedback
-                    if (searchText === "You got the answer!") this.questions.find(item => item.name === questionName).status = " ✔️";
+                    if (searchText.includes("You have got the answer")) this.questions.find(item => item.name === questionName).status = " ✔️";
                     else if (searchText === "You have missed the answer... check your code again?") this.questions.find(item => item.name === questionName).status = " 🤨";
                     else this.questions.find(item => item.name === questionName).status = " 🔴"
                 }
