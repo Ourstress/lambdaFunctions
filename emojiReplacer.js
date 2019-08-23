@@ -262,7 +262,7 @@ exports.handler = async (event) => {
             : throwError("no first input")
         }
         catch(error){
-            activityVariables2 = error.message
+            errorMessage = error.message
         }
         try {
             executeUserSolution = eval(userSolution)
