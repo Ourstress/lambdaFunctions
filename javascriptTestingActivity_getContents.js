@@ -232,7 +232,7 @@ function getContents() {
       min-height: 800px;
     }
     .md-content {
-      min-height: 800px;
+      min-height: 1200px !important;
     }
     .md-card {
       overflow: hidden;
@@ -289,7 +289,7 @@ function getContents() {
         margin-top: 1rem;
         padding:20px;
         text-align: center
-    }    
+    }
   </style>
 </html>
 `;
