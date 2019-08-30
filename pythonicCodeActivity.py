@@ -345,9 +345,10 @@ def lambda_handler(event, context):
         }
         
     if method == 'POST':
+        import re
         bodyContent = event.get('body',{}) 
         parsedBodyContent = json.loads(bodyContent)
-        testCases = parsedBodyContent["shown"]["0"] 
+        testCases = re.sub('&zwnj;.*&zwnj;','',parsedBodyContent["shown"]["0"], flags=re.DOTALL) 
         solution = parsedBodyContent["editable"]["0"] 
 
         timeout = False

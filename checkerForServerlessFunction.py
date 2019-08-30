@@ -457,11 +457,12 @@ def lambda_handler(event, context):
         }
 
     if method == 'POST':
+        import re
         recResp = json.loads(event.get('body', {}))
         print("Received request")
         print(recResp)
         testUrl = recResp["editable"]["0"].strip()
-        shownTest = recResp["shown"]["0"].strip().splitlines()
+        shownTest = re.sub('&zwnj;.*&zwnj;','',recResp["shown"]["0"], flags=re.DOTALL).strip().splitlines()
         userToken = recResp["userToken"].strip()
         #Execute tests
         shownJsonResp = exec_tests(testUrl,shownTest,userToken)

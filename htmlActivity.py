@@ -310,7 +310,8 @@ def lambda_handler(event, context):
 
         # After setting the alarm clock we invoke the long running function.
         try:
-            for item in testCases.strip().splitlines():
+            import re
+            for item in re.sub('&zwnj;.*&zwnj;','',testCases, flags=re.DOTALL).strip().splitlines():
                 regexMatchHtmlContents = re.search(item, solution)
                 expectedText = item.replace("<","&lt;").replace(">","&gt;")
                 if hasattr(regexMatchHtmlContents, 'group'):
@@ -408,7 +409,7 @@ def lambda_handler(event, context):
             "Content-Type": "application/json",
                 },
             "body":  json.dumps({
-                "isComplete":True,
+                "isComplete":overallResults == "All tests passed: True",
                 "jsonFeedback": json.dumps(overallResults),
                 "htmlFeedback": htmlResults,
                 "textFeedback": overallResults + "\n" + textResults
