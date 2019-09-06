@@ -1,4 +1,8 @@
 """ 
+Notes:
+* This activity requires Python 3.7 runtime
+* Set timeout to 30s
+
 Steps to include bleach library in your own lambda function
 1. create a folder to contain all the files we need
 2. create a file called lambda_function.py (the name has to be lambda_function)

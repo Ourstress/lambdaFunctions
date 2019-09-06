@@ -1,3 +1,5 @@
+// This activity requires Node.js 10.x runtime
+
 exports.handler = async event => {
   const indexPage = `
     <html>

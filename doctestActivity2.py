@@ -1,3 +1,4 @@
+# This activity requires Python 2.7 runtime
 # -*- coding: utf-8 -*-
 import json
 import traceback

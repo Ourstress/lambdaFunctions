@@ -1,3 +1,5 @@
+# This activity requires Python 3.6 and above runtime
+# set timeout to 30s
 try:
     import requests
 except ImportError:
