@@ -127,7 +127,7 @@ def lambda_handler(event, context):
         props: ['layoutThings', 'questionName'],
         data: function () {
             return {
-            answer:"",
+            answer:{jsonFeedback:'',htmlFeedback:'',textFeedback:'',isComplete:false},
             layoutItems: this.layoutThings
         }
         },
@@ -135,6 +135,7 @@ def lambda_handler(event, context):
             postContents: function () {
             // comment: leaving the gatewayUrl empty - API will post back to itself
             const gatewayUrl = '';
+            this.$set(this, 'answer', {jsonFeedback:'',htmlFeedback:'',textFeedback:'',isComplete:false})
             fetch(gatewayUrl, {
         method: "POST",
         headers: {
@@ -146,6 +147,7 @@ def lambda_handler(event, context):
             return response.json()
         }).then(data => {
             this.answer = JSON.parse(JSON.stringify(data))
+            this.answer.jsonFeedback = JSON.stringify(this.answer.jsonFeedback)
             return this.$emit('questionhandler',{data, questionName:this.questionName})
             })
          }
@@ -461,7 +463,7 @@ def lambda_handler(event, context):
                 },
             "body":  json.dumps({
                 "isComplete":jsonResponseData.get("solved"),
-                "jsonFeedback": jsonResponse,
+                "jsonFeedback": jsonResponseData,
                 "htmlFeedback": htmlResults,
                 "textFeedback": textResults
             })

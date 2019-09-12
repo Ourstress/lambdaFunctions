@@ -2,8 +2,10 @@
 Notes:
 * This activity requires Python 3.7 runtime
 * Set timeout to 30s
+* Note: this activity requires the bleach library which isn't provided in AWS console
+* Therefore, to replicate this function, you can consider following the steps below in AWS cloud9
 
-Steps to include bleach library in your own lambda function
+Steps to include bleach library in your own lambda function within AWS Cloud9
 1. create a folder to contain all the files we need
 2. create a file called lambda_function.py (the name has to be lambda_function)
 3. navigate to the directory in terminal / command prompt and run pip install bleach -t . (-t . installs bleach to current folder)
@@ -49,13 +51,14 @@ def lambda_handler(event, context):
         props: ['layoutThings', 'questionName'],
         data: function () {
             return {
-            answer:"",
+            answer:{jsonFeedback:'',htmlFeedback:'',textFeedback:'',isComplete:false},
             layoutItems: this.layoutThings
         }
         },
         methods: {
             postContents: function () {
             // comment: leaving the gatewayUrl empty - API will post back to itself
+            this.$set(this, 'answer', {jsonFeedback:'',htmlFeedback:'',textFeedback:'',isComplete:false});
             const gatewayUrl = '';
             fetch(gatewayUrl, {
         method: "POST",
@@ -140,7 +143,7 @@ def lambda_handler(event, context):
             return {
             questions:[
                 {name:"question 1", layoutItems: [
-                {header:"Expected Result", subHeader:'', vModel:"<h1>Today is a day for 🍨</h1>"},
+                {header:"Expected Result", subHeader:'', vModel:"&zwnj;hello&zwnj;<h1>Today is a day for 🍨</h1>"},
                 {header:"Editable HTML", subHeader:'Your code goes below', vModel:"<h1>Today is a day for</h1>"}
                 ], status:" 🔴"},
                 {name:"question 2", layoutItems: [

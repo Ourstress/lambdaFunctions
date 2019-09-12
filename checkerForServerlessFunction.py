@@ -1,5 +1,3 @@
-# This activity requires Python 3.6 and above runtime
-# set timeout to 30s
 try:
     import requests
 except ImportError:
@@ -35,7 +33,7 @@ def getIndexPage():
         props: ['layoutThings', 'questionName'],
         data: function () {
             return {
-            answer:"",
+            answer:{jsonFeedback:'',htmlFeedback:'',textFeedback:'',isComplete:false},
             layoutItems: this.layoutThings
         }
         },
@@ -43,6 +41,7 @@ def getIndexPage():
             postContents: function () {
             // comment: leaving the gatewayUrl empty - API will post back to itself
             const gatewayUrl = '';
+            this.$set(this, 'answer', {jsonFeedback:'',htmlFeedback:'',textFeedback:'',isComplete:false});
             fetch(gatewayUrl, {
         method: "POST",
         headers: {
@@ -54,6 +53,7 @@ def getIndexPage():
             return response.json()
         }).then(data => {
             this.answer = JSON.parse(JSON.stringify(data))
+            this.answer.jsonFeedback = JSON.stringify(this.answer.jsonFeedback)
             return this.$emit('questionhandler',{data, questionName:this.questionName})
             })
          }
@@ -443,7 +443,7 @@ def calcFeedback(jsonResponse,userToken):
     allFeedback = {"isCorrect": allTestCaseResult,
                     "htmlFeedback": htmlResults, 
                     "textFeedback": textResults, 
-                    "jsonFeedback": json.dumps(jsonResponseData, indent=4, sort_keys=True)}
+                    "jsonFeedback": jsonResponseData}
     return allFeedback
 
 def lambda_handler(event, context):

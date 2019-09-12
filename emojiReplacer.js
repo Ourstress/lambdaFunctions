@@ -1,5 +1,3 @@
-// This activity requires Node.js 10.x runtime
-
 exports.handler = async event => {
   const indexPage = `
     <html>
@@ -29,7 +27,7 @@ exports.handler = async event => {
         props: ['layoutThings', 'questionName'],
         data: function () {
             return {
-            answer:"",
+            answer:{jsonFeedback:'',htmlFeedback:'',textFeedback:'',isComplete:false},
             layoutItems: this.layoutThings
         }
         },
@@ -37,6 +35,7 @@ exports.handler = async event => {
             postContents: function () {
                 // comment: leaving the gatewayUrl empty - API will post back to itself
                 const gatewayUrl = '';
+                this.$set(this, 'answer', {jsonFeedback:'',htmlFeedback:'',textFeedback:'',isComplete:false})
                 fetch(gatewayUrl, {
                     method: "POST",
                     headers: {
