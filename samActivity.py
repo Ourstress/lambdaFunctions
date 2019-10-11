@@ -79,8 +79,7 @@ def lambda_handler(event, context):
                 <md-card>
                     <md-card-header>
                         <md-card-header-text>
-                            <div class="md-title">Output</div>
-                            <div class="md-subhead">Test results</div>
+                            <div class="md-title">Instructions</div>
                         </md-card-header-text>
                     </md-card-header>
                     <md-card-content>
